@@ -12,6 +12,10 @@ from tkinter import filedialog
 from tkinter import *
 from pymsgbox import *
 
+# NN related
+import numpy as np
+from PIL import Image
+
 class Controller:
 
     def __init__(self, model):
@@ -30,6 +34,25 @@ class Controller:
     def predict_button_on_action(self, button):
         print("Predict")
 
+        # Process screen for input
+        screen, label = button.associated_elements
+        screen_array = pg.surfarray.array3d(screen)
+        screen_array = screen_array[Settings.DRAW_AREA_X:Settings.DRAW_AREA_X+Settings.DRAW_AREA_WIDTH, \
+                                    Settings.DRAW_AREA_Y:Settings.DRAW_AREA_Y+Settings.DRAW_AREA_HEIGHT]
+
+        draw_area = np.zeros((screen_array.shape[0] - 2, screen_array.shape[1] - 2), dtype=np.uint8)
+
+        for col in range(2, Settings.DRAW_AREA_WIDTH - 2):
+            for row in range(2, Settings.DRAW_AREA_HEIGHT - 2):
+                val = screen_array[row, col]
+                draw_area[row, col] = val[0]
+
+        img = Image.fromarray(draw_area.T, 'L')
+        img = img.resize((28, 28))
+        x_vector = np.array(img).reshape(784) / 255.0
+        prediction = self.model.predict(x_vector.T)
+        label.text = f"Prediction: {prediction}"
+
     def load_button_on_action(self, button):
         print("Load")
 
@@ -41,13 +64,13 @@ class Controller:
         self.is_dragged = False
         if path:
             self.model.load(path)
-            print("Loaded from", path)
             self._pop_up("Load Successful", "Loaded the Network successfully.")
 
     def _pop_up(self, title, msg):
         root = Tk()
         root.withdraw()
         messagebox.showinfo(title, msg)
+        root.destroy()
 
     def _handle_gui_elements(self, e, mouse, keys):
 
@@ -102,6 +125,6 @@ class Controller:
         if e.type == pg.QUIT:
             quit(0)
 
+        self._handle_gui_elements(e, mouse, keys)
         self._handle_mouse(e, mouse)
         self._handle_keyboard(e, keys)
-        self._handle_gui_elements(e, mouse, keys)

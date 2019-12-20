@@ -33,7 +33,7 @@ class NeuralNetView(Observer):
 
         predict_button = Button("Predict", x, y, width, height)
         predict_button.set_on_action(self.controller.predict_button_on_action)
-        predict_button.set_associated_elements([predict_label])
+        predict_button.set_associated_elements((self.screen, predict_label))
 
         self.gui_elements.append(predict_button)
 
@@ -45,10 +45,6 @@ class NeuralNetView(Observer):
     def _render_screen(self, model=None):
 
         self.screen.fill(Settings.BACKGROUND_COLOR)
-
-        pg.draw.rect(self.screen, Settings.DRAW_COLOR, \
-                    (Settings.DRAW_AREA_X, Settings.DRAW_AREA_Y, Settings.DRAW_AREA_WIDTH, Settings.DRAW_AREA_HEIGHT), \
-                    Settings.BOX_EDGE_THICKNESS)
 
         # Execute all drawing commands
         if model:
@@ -72,6 +68,11 @@ class NeuralNetView(Observer):
                 font = pg.font.SysFont(Settings.DEFAULT_FONT[0], Settings.DEFAULT_FONT[1])
                 label_text = font.render(text, True, Settings.BUTTON_TEXT_COLOR)
                 self.screen.blit(label_text, (x, y))
+
+        pg.draw.rect(self.screen, Settings.DRAW_COLOR, \
+                    (Settings.DRAW_AREA_X, Settings.DRAW_AREA_Y, Settings.DRAW_AREA_WIDTH, Settings.DRAW_AREA_HEIGHT), \
+                    Settings.BOX_EDGE_THICKNESS)
+
 
         pg.display.update()
 

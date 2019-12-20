@@ -10,7 +10,7 @@ class Button(GUI_Element):
 
         self.text = text
 
-        self.associated_elements = []
+        self.associated_elements = ()
 
         self.x = x
         self.y = y

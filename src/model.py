@@ -13,7 +13,10 @@ class Model(Observable, Observer):
         self.commands = []
 
     def load(self, path):
-        pass
+        self.neural_net.load(path)
+
+    def predict(self, x):
+        return self.neural_net.evaluate(x)
 
     def update(self, command):
         self.notify_observers()
